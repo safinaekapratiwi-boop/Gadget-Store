@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -46,11 +47,25 @@ class ProductController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'deskription' => ['nullable', 'string', 'max:2000'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:5048'],
         ]);
 
-        Product::create($validated);
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')
+                ->store('product_images', 'public');
+        }
 
-        return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
+        $product = Product::create($validated);
+
+        // Catat aktivitas tambah produk
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'activity' => 'Tambah Produk',
+            'description' => 'Menambahkan produk ' . $product->name,
+        ]);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil ditambahkan.');
     }
 
     public function edit(Product $product)
@@ -73,18 +88,41 @@ class ProductController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'deskription' => ['nullable', 'string', 'max:2000'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:5048'],
         ]);
 
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')
+                ->store('product_images', 'public');
+        }
 
         $product->update($validated);
 
-        return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
+        // Catat aktivitas edit produk
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'activity' => 'Edit Produk',
+            'description' => 'Mengubah data produk ' . $product->name,
+        ]);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function destroy(Product $product)
     {
+        $productName = $product->name;
+
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');
+        // Catat aktivitas hapus produk
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'activity' => 'Hapus Produk',
+            'description' => 'Menghapus produk ' . $productName,
+        ]);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil dihapus.');
     }
 }

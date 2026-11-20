@@ -14,13 +14,15 @@ class DashboardController extends Controller
         $totalCategories = Category::count();
         $totalStock = (int) Product::sum('stock');
 
+        // Jumlah produk yang stoknya menipis atau habis
         $lowStockProducts = Product::where('stock', '<=', 5)->count();
 
+        // Nilai seluruh inventaris
         $inventoryValue = (float) Product::selectRaw(
             'COALESCE(SUM(price * stock), 0) as total'
         )->value('total');
 
-        // Data jumlah produk dan stok setiap kategori
+        // Statistik kategori
         $categoryStats = Category::query()
             ->leftJoin('products', 'categories.id', '=', 'products.category_id')
             ->select(
@@ -46,6 +48,18 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Daftar produk yang perlu diperhatikan stoknya
+        $stockAlerts = Product::with('category')
+            ->where('stock', '<=', 5)
+            ->orderBy('stock', 'asc')
+            ->get();
+
+        // Jumlah produk yang stoknya habis
+        $outOfStockProducts = Product::where('stock', 0)->count();
+
+        // Jumlah produk yang stoknya menipis
+        $criticalStockProducts = Product::whereBetween('stock', [1, 5])->count();
+
         return view('dashboard', compact(
             'totalProducts',
             'totalCategories',
@@ -54,7 +68,10 @@ class DashboardController extends Controller
             'inventoryValue',
             'categoryStats',
             'stockStatus',
-            'latestProducts'
+            'latestProducts',
+            'stockAlerts',
+            'outOfStockProducts',
+            'criticalStockProducts'
         ));
     }
 }

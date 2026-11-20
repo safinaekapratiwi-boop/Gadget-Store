@@ -36,4 +36,18 @@
 <label>Deskripsi</label>
 <textarea name="deskription" class="form-control">{{ old('deskription',$product->deskription ?? '') }}</textarea>
 </div>
+<div class="col-md-6">
+<label>Gambar Produk</label>
+<input type="file" name="image" class="form-control">
+<small class="text-secondary">Format: jpg, jpeg, png, gif. Maksimal 5MB.</small>
+@error('image')
+<div><small class="text-danger">{{ $message }}</small></div>
+@enderror
+
+@if(!empty($product->image))
+    <div class="mt-2">
+        <img src="{{ asset('storage/'.$product->image) }}" alt="Gambar Produk" class="img-thumbnail" style="max-width: 1x;">
+    </div>
+@endif
+
 </div>

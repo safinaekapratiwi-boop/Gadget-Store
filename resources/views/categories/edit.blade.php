@@ -1,43 +1,66 @@
 @extends('layouts.app')
-@section('title','Edit Kategori')
+
+@section('title', 'Edit Kategori')
+@section('page_heading', 'Edit Kategori')
+
 @section('content')
 
-<h3>Edit Kategori</h3>
+<style>
+    .category-edit-page {
+        color: #26354a;
+    }
 
-<form method="POST" action="{{ route('categories.update',$category) }}">
-@csrf
-@method('PUT')
+    .category-edit-header {
+        margin-bottom: 25px;
+    }
 
-<div class="mb-3">
-    <label>Nama kategori</label>
-    <input name="name" class="form-control" value="{{ old('name',$category->name) }}">
-    @error('name')<div class="text-danger">{{ $message }}</div>@enderror
-</div>
+    .category-edit-header h3 {
+        color: #17243b;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
 
-<div class="mb-3">
-    <label>Deskripsi</label>
-    <textarea name="deskription" class="form-control">{{ old('deskription',$category->deskription) }}</textarea>
-</div>
+    .category-edit-header p {
+        color: #8793a5;
+        font-size: 13px;
+        margin: 0;
+    }
 
-<div class="mb-3">
-    <label>Status</label>
-    <select name="status" class="form-select">
-        <option value="Aktif" {{ old('status',$category->status) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-        <option value="Tidak Aktif" {{ old('status',$category->status) == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
-    </select>
-</div>
+    .category-edit-card {
+        background: white;
+        border-radius: 17px;
+        border: 1px solid #e8edf5;
+        box-shadow: 0 5px 20px rgba(30,50,80,.05);
+        overflow: hidden;
+    }
 
-<div class="mb-3">
-    <label>Jumlah Stok</label>
-    <input type="number" name="stock" class="form-control"
-        value="{{ old('stock', $category->stock) }}" min="0">
-    @error('stock')
-        <div class="text-danger">{{ $message }}</div>
-    @enderror
-</div>
+    .category-edit-card-header {
+        padding: 20px 25px;
+        background: linear-gradient(135deg, #17243b, #263c5e);
+        color: white;
+    }
 
-<button class="btn btn-primary">Simpan Perubahan</button>
-<a href="{{ route('categories.index') }}" class="btn btn-secondary">Batal</a>
+    .category-edit-card-header h5 {
+        font-weight: 800;
+        margin: 0;
+        font-size: 16px;
+    }
 
-</form>
-@endsection
+    .category-edit-card-header p {
+        margin: 5px 0 0;
+        font-size: 12px;
+        color: #b8c9e2;
+    }
+
+    .category-edit-card-body {
+        padding: 25px;
+    }
+
+    .category-edit-card-body label {
+        color: #34445b;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .category-edit-card-body .form-control,
